@@ -1,0 +1,67 @@
+---
+- hosts: localhost
+  vars:
+    apt_packages:
+    - vim
+    - curl
+    - git
+    - s3curl
+    - s3cmd
+    - ansible
+    - vim-nox-py2
+    - python-pip
+    - unzip
+    pip_packages:
+    - ipython
+    - pylxd
+    - boto
+    - virtualenv
+
+  tasks:
+    - name: Apt Install packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "{{ apt_packages }}"
+      register: apt_results
+      tags:
+        - apt
+    
+    - name: pip Install packages
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "{{ pip_packages }}"
+      register: pip_results
+      tags:
+        - pip
+
+    - name: "git clc-sdk"
+      git:
+        repo: https://github.com/CenturyLinkCloud/clc-python-sdk.git
+        dest: /srv/clc-python-sdk
+
+    - name: pip install git clc-python-sdk
+      pip:
+        name: /srv/clc-python-sdk/src
+
+    - name: git clc ansible module
+      git:
+        repo: git://github.com/CenturyLinkCloud/clc-ansible-module.git
+        clone: yes
+        dest: /srv/clc-ansible-module
+
+    - name: pip install git clc-python-sdk
+      pip:
+        name: /srv/clc-ansible-module
+
+
+    - name: "Ansible copy files remote to remote"
+      copy:
+        src: myenv.sh      
+        dest: /etc/profile.d
+        remote_src: yes
+
+
