@@ -1,0 +1,10 @@
+vim
+curl
+git
+s3curl
+s3cmd
+ansible
+vim-noxipy2 
+python-pip
+
+
