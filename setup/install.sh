@@ -5,7 +5,7 @@
 
 export oldDir=$PWD
 apt update
-apt upgrade -y
+apt upgrade -y --force-yes
 apt autoremove -y
 apt install software-properties-common -y
 apt-add-repository ppa:ansible/ansiblei -y -u
