@@ -27,3 +27,6 @@ ansible-galaxy install -r requirements.yml
 echo "[CGM] run install.yml playbook"
 ansible-playbook install.yml
 
+cd ../
+echo "[CGM] run site.yml playbook to build hasicorp cluster"
+ansible-playbook setup.yml
