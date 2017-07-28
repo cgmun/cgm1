@@ -30,4 +30,4 @@ ansible-playbook install.yml
 cd ../
 pwd
 echo "[CGM] run site.yml playbook to build hasicorp cluster"
-ansible-playbook setup.yml
+ansible-playbook bld_hashi_cluster.yml
