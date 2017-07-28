@@ -1,0 +1,12 @@
+---
+bare_metal: False
+
+#nomad_docker_enable: true
+hashi_mgmt_count: 2  
+hashi_node_count: 2
+
+
+env:
+  CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+  CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+

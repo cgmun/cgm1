@@ -1,0 +1,7 @@
+---
+
+  - name: debug from clc-server-bm.yml
+    debug: 
+      msg: hello from clc-server-bm.yml
+
+

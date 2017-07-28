@@ -1,0 +1,53 @@
+---
+# File: site.yml - Example Consul site playbook
+
+- name: Roles and Task run on localhost 
+  hosts: localhost
+  gather_facts: true
+  connection: local
+  tasks:
+    - name: remove known_hosts file
+      shell: rm -f ~/.ssh/known_hosts
+      ignore_errors: yes
+  roles:
+    - { role: clc, tags: ['create_server'] }
+
+- name: Roles and Task run on all servers
+  hosts: all
+  gather_facts: false
+  remote_user: root
+  any_errors_fatal: true
+  become: yes
+  become_user: root
+  roles:
+    - { role: hosts_files, tags: all_hosts_files, host_servers: "{{ hostvars.localhost.all_servers }}" }
+
+- name: Roles and Task run on localhost
+  hosts: localhost
+  gather_facts: False
+  connection: local
+  roles:
+    - { role: hosts_files, tags: localhost_hosts_files, host_servers: "{{ hostvars.localhost.all_servers }}" }
+
+- name: Assemble Consul, Nomad, dnsmasq, docker cluster
+  hosts: cluster_nodes
+  gather_facts: true 
+  remote_user: root
+  any_errors_fatal: true
+  become: yes
+  become_user: root
+#  environment:
+#    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+#    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+
+  roles:
+    - { role: ssh-keys, tags: ssh-keys }
+    - { role: os-setup, tags: os-setup }
+    - { role: kbrebanov.ntp, tags: ntp }
+#    - { role: lxd, tags: lxd }
+#    - { role: andrewrothstein.consul-template, tags: consul-template }
+    - {role: brianshumate.consul, tags: 'consul' }
+#    - {role: brianshumate.vault, tags: 'vault' }
+    - {role: brianshumate.nomad, tags: 'nomad' }
+    - { role: lobsterdore.fabio, fabio_version: 1.5.0, tags: 'fabio' }
+  

@@ -1,0 +1,9 @@
+- src: brianshumate.consul
+- src: brianshumate.nomad
+- src: brianshumate.vault
+- src: lobsterdore.fabio
+- src: kbrebanov.ntp
+- src: andrewrothstein.consul-template
+- src: jriguera.dnsmasq
+- src: kbrebanov.ntp
+

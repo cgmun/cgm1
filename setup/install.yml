@@ -10,11 +10,13 @@
     - ansible
     - vim-nox-py2
     - python-pip
-    - unzip
+    - python-netaddr
+
     pip_packages:
     - jupyter
     - pylxd
     - boto
+    - netaddr
     - virtualenv
 
   tasks:

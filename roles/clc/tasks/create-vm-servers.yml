@@ -1,0 +1,49 @@
+---
+#- name: debug CLC_V2_API_USERNAME
+#  debug: var=CLC_V2_API_USERNAME
+#- name: debug CLC_V2_API_PASSWD
+#  debug: var=CLC_V2_API_PASSWD
+#- name: debug consul_domain
+#  debug: var=consul_domain
+#- name: debug consul_control_count
+#  debug: var=consul_control_count
+#- name: debug consul_datacenter
+#  debug: var=consul_datacenter
+
+- name: Deploy MGMT Cluster Nodes
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_server:
+    name: "mgmt"
+    password: "{{ ansible_ssh_pass }}"
+    template: "ubuntu-16-64"
+    #count: "{{ consul_control_count }}"
+    count_group: "{{ consul_domain }}-mgmt"
+    exact_count: "{{ hashi_mgmt_count }}"
+    cpu: 2
+    memory: 2
+    group: "{{ consul_domain }}-mgmt"
+    location: "{{ consul_datacenter }}"
+    #state: "present"
+  register: mgmt_nodes
+  when: mgmt_server_count|int < hashi_mgmt_count
+
+- name: Deploy Client NODE Cluster Nodes
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_server:
+    name: "node"
+    password: "{{ ansible_ssh_pass }}"
+    template: "ubuntu-16-64"
+    #count: "{{ consul_control_count }}"
+    count_group: "{{ consul_domain }}-nodes"
+    exact_count: "{{ hashi_node_count }}"
+    cpu: 2
+    memory: 2
+    group: "{{ consul_domain }}-nodes"
+    location: "{{ consul_datacenter }}"
+    #state: "present"
+  register: client_nodes
+  when: node_server_count|int < hashi_node_count

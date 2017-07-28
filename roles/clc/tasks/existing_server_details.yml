@@ -1,0 +1,114 @@
+---
+# Get server detail from consul_domain
+
+- name: Retrieve mgmt Group Facts
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_group_fact:
+    group_id: "{{mgmt_grp_id}}"
+  register: mgmt_grp_details
+
+- name: Retrieve node Group Facts
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_group_fact:
+    group_id: "{{node_grp_id}}"
+  register: node_grp_details
+
+- name: get - mgmt_servers_list
+  set_fact:
+    mgmt_servers_list: "{{mgmt_grp_details.group.servers}}"
+
+- name: get - node_servers_list
+  set_fact:
+    node_servers_list: "{{node_grp_details.group.servers}}"
+
+- name: clc_server_fact get mgmt servers info
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_server_fact:
+    server_id: "{{item}}"
+    credentials: true
+  with_items: "{{mgmt_servers_list}}"
+  register: mgmt_servers_details
+
+- name: clc_server_fact get node servers info
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_server_fact:
+    server_id: "{{item}}"
+    credentials: true
+  with_items: "{{ node_servers_list}}"
+  register: node_servers_details
+
+- name: DEBUG - node_servers_list
+  debug: var=node_servers_list
+
+- name: store all mgtmt Servers ipaddress and Credentials in all_servers dict for mgmt
+  set_fact:
+    all_servers: "{{ all_servers|default({}) | combine( {item.server.name : {'id': item.server.name, 'ip': item.server.ipaddress, 'password': item.server.credentials.password, 'role': 'mgmt' }} ) }}"
+  with_items: "{{mgmt_servers_details.results|sort}}"
+
+- name: store all node Servers ipaddress and Credentials in all_servers dict for nodes
+  set_fact:
+    all_servers: "{{ all_servers|default({}) | combine( {item.server.name : {'id': item.server.name, 'ip': item.server.ipaddress, 'password': item.server.credentials.password, 'role': 'node'}} ) }}"
+  with_items: "{{node_servers_details.results|sort}}"
+
+- name: debug all_servers
+  debug: var=all_servers
+
+- name: Create cluster_nodes groups - server
+  add_host:
+    name: "{{ item.value.id}}"
+    ansible_host: "{{ item.value.ip }}"
+    ansible_user: root
+    ansible_ssh_pass: "{{ item.value.password }}"
+    consul_node_role: server
+    lxd_node_role: client
+    nomad_node_role: server 
+    nomad_advertise_address: "{{ item.value.ip }}"
+    groups: cluster_nodes
+  when: mgmt_server_count|int > 1 and item.value.role == 'mgmt'
+  with_dict: "{{ all_servers }}"
+
+- name: Create cluster_nodes groups - client/node
+  add_host:
+    name: "{{ item.value.id}}"
+    ansible_host: "{{ item.value.ip }}"
+    ansible_user: root
+    ansible_ssh_pass: "{{ item.value.password }}"
+    consul_node_role: client
+    lxd_node_role: server
+    nomad_node_role: client
+    nomad_no_host_uuid: true
+    nomad_advertise_address: "{{ item.value.ip }}"
+    groups: cluster_nodes
+  when: node_server_count|int > 1 and item.value.role == 'node'
+  with_dict: "{{ all_servers }}"
+
+- name: Create cluster_nodes groups - bootstrap
+  add_host:
+    name: "{{all_servers[item.1]['id']}}"
+    ansible_host: "{{all_servers[item.1]['ip']}}"
+    ansible_user: root
+    ansible_ssh_pass: "{{all_servers[item.1]['password']}}"
+    consul_node_role: bootstrap
+    groups: cluster_nodes, bootstrap
+  when: item.0 == 0 
+  with_indexed_items: "{{mgmt_servers_list|sort}}"
+
+- name: Debug all groups
+  debug:
+    msg: "{{ groups }}"
+  ignore_errors: yes
+
+
+#- name: Debug client groups
+#  debug:
+#    msg: "{{ groups[cluster_nodes] }}"
+#  ignore_errors: yes
+

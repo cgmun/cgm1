@@ -1,0 +1,126 @@
+---
+
+- name: Check if clc parent hashi group exist, if so get info on group
+  environment:
+    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+  clc_group:
+    name: "{{ consul_domain }}"
+    location: "{{ consul_datacenter }}"
+    state: present
+  register: hashi_grp
+
+- name: debug hashi_grp
+  debug: var=hashi_grp
+
+- name: Get current clc groups, if any
+  set_fact:
+    group_list: "{{group_list| default([])}} + [ '{{item.name}}' ]"
+  with_items: "{{hashi_grp.group.groups }}"
+
+- name: set_fact get clc group uuid and check if new group
+  set_fact:
+    hashi_grp_id: "{{hashi_grp.group.id}}"
+    #sub_groups:  "{{ hashi_grp.group.groups }}"
+
+- name: DEBUG group list
+  debug: var=group_list
+
+- block:
+  - name: If node group is missing, then create
+    environment:
+      CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+      CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+    clc_group:
+      name: "{{ consul_domain }}-nodes"
+      parent: "{{ consul_domain }}"
+      location: "{{ consul_datacenter }}"
+      state: present
+    register: node_grp
+
+  - name: set node server count group to 0
+    set_fact:
+      node_server_count: 0
+      node_grp_id: "{{ node_grp.group.id }}"
+  when: hashi_grp.changed or not group_list|string | search('consul-nodes')
+
+- block: 
+  - name: If mgmt group is missing, then create
+    environment:
+      CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
+      CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
+    clc_group:
+      name: "{{ consul_domain }}-mgmt"
+      parent: "{{ consul_domain }}"
+      location: "{{ consul_datacenter }}"
+      state: present
+    register: mgmt_grp
+
+  - name: set mgmt server count group to 0
+    set_fact:
+      mgmt_server_count: 0
+      mgmt_grp_id: "{{ mgmt_grp.group.id }}"
+  when: hashi_grp.changed or not group_list|string | search('consul-mgmt')
+
+- name: Get group id for consul-mgmt
+  set_fact: 
+    mgmt_grp: "{{ item }}"
+    mgmt_grp_id: "{{ item.id }}"
+    mgmt_server_count: "{{ item.serversCount | default(0) }}"
+  with_items: "{{hashi_grp.group.groups}}"
+  when: not hashi_grp.changed and item.name == "consul-mgmt"
+
+- name: Get group id for consul-nodes
+  set_fact:
+    node_grp: "{{ item }}"
+    node_grp_id: "{{ item.id }}"
+    node_server_count: "{{ item.serversCount | default(0) }}"
+  with_items: "{{hashi_grp.group.groups}}"
+  when: not hashi_grp.changed and item.name == "consul-nodes"
+  
+#- name: Debug -  node_grp_id
+#  debug: var=node_grp_id
+
+- name: Debug - mgmt_grp
+  debug: var=mgmt_grp
+
+- name: Debug - node_grp
+  debug: var=node_grp
+
+- name: Debug -  mgmt_server_count
+  debug: var=mgmt_server_count
+
+#- name: Debug - mgmt_grp_id
+#  debug: var=mgmt_grp_id
+
+- name: Debug -  node_server_count
+  debug: var=node_server_count
+
+#- name: Debug - node_grp_id
+#  debug: var=node_grp_id
+
+- name: Cluster MGMT server count 
+  debug: 
+    msg: "Current MGMT Server {{ mgmt_server_count }} need {{ hashi_mgmt_count }}"
+
+- name: Cluster CLIENT server count
+  debug: 
+    msg: "Current MGMT Server {{ node_server_count }} need {{ hashi_node_count }}"
+
+# Either Create new server or get existing server details
+#- name: if new cluster, create clc baremetal
+#  include: create-bm-servers.yml
+#  when: node_server_count|int < hashi_node_count or mgmt_server_count|int < hashi_mgmt_count and bare_metal 
+
+- name: TEST node_server_count
+  debug: var=node_server_count
+
+- name: if new cluster, missing or more servers needed,  create clc vms
+  include: create-vm-servers.yml
+  when: node_server_count|int < hashi_node_count or mgmt_server_count|int < hashi_mgmt_count and not bare_metal
+
+- name: get existing server details and add_host
+  include: existing_server_details.yml
+
+- name: DEBUG hostvars.localhost.all_servers
+  debug: var=hostvars.localhost.all_servers

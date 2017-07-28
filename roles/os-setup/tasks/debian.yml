@@ -1,0 +1,38 @@
+---
+
+- name: apt - Update and upgrade ubuntu
+  apt:
+    upgrade: dist
+    update_cache: yes
+  async: 1000
+  poll: 0
+  register: apt_upgraderesults
+
+- name: 'Apt wait upgrade to complete'
+  async_status: jid={{ apt_upgraderesults.ansible_job_id }}
+  register: job_result
+  until: job_result.finished
+  retries: 300
+
+- name: Autoremove - Remove dependencies that are no longer required
+  command: apt-get -y autoremove
+  register: autoremove_output
+  changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+
+#- name: apt - Remove dependencies that are no longer required
+#  shell: apt autoremove -y
+#  register: apt-autoremove
+#  ignore_errors: true
+
+#  apt:
+#    autoremove: yes
+
+#- name: Run the equivalent of "apt-get update" as a separate step
+#  apt:
+#    update_cache: yes
+    
+#- name: Update all packages to the latest version
+#  apt:
+#    upgrade: dist
+
+

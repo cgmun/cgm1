@@ -1,0 +1,14 @@
+---
+
+#- name: create /tmp/testfile  if needed
+#  shell: touch /tmp/testfile 
+
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ item.value.ip }} {{ item.value.id }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.value.id }}"
+  with_dict: "{{ host_servers }}" 
+  #with_dict: "{{ hostvars.localhost.all_servers }}"
+
