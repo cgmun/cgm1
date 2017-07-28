@@ -5,10 +5,15 @@
 
 export oldDir=$PWD
 apt update
-apt upgrade -y 
+
+yes '' | apt upgrade -y 
+
 apt autoremove -y
+
 apt install software-properties-common -y
+
 apt-add-repository ppa:ansible/ansible -y -u
+
 apt install -y git ansible
 
 repo=cgm1
