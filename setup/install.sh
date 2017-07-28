@@ -20,7 +20,7 @@ echo "[CGM] git cgm1"
 repo=cgm1
 git clone https://github.com/cgmun/$repo.git
 cd $repo/setup
-
+pwd
 echo "[CGM] galaxy install required ansible module"
 ansible-galaxy install -r requirements.yml
 
