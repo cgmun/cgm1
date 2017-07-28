@@ -28,5 +28,6 @@ echo "[CGM] run install.yml playbook"
 ansible-playbook install.yml
 
 cd ../
+pwd
 echo "[CGM] run site.yml playbook to build hasicorp cluster"
 ansible-playbook setup.yml
