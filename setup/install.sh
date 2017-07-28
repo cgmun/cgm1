@@ -8,7 +8,7 @@ apt update
 apt upgrade -y --force-yes
 apt autoremove -y
 apt install software-properties-common -y
-apt-add-repository ppa:ansible/ansiblei -y -u
+apt-add-repository ppa:ansible/ansible -y -u
 apt install -y git ansible
 
 repo=cgm1
