@@ -12,7 +12,7 @@
     - python-pip
     - unzip
     pip_packages:
-    - ipython
+    - jupyter
     - pylxd
     - boto
     - virtualenv
@@ -27,7 +27,11 @@
       register: apt_results
       tags:
         - apt
-    
+
+    - name: pip upgrade
+      shell: pip install --upgrade pip
+      register: Pip_upgrade   
+
     - name: pip Install packages
       pip:
         name: "{{ item }}"
@@ -66,7 +70,7 @@
 
     - name: "Ansible copy files remote to remote"
       copy:
-        src: myenv.sh      
+        src: files/myenv.sh      
         dest: /etc/profile.d
         remote_src: yes
       tags:
