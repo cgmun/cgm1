@@ -7,9 +7,7 @@ export oldDir=$PWD
 echo "[CGM] apt update running" 
 apt update
 echo "[CGM] apt upgrade running"
-#yes '' | apt upgrade -y 
-apt upgrade -y
-echo "[CGM] apt upgrade complete!!!!!!"
+yes '' | apt upgrade -y 
 echo "[CGM] apt auto remove running"
 apt autoremove -y
 echo "[CGM] apt install  software-properties-common"
