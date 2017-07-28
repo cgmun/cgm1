@@ -38,30 +38,37 @@
       tags:
         - pip
 
-    - name: "git clc-sdk"
+    - name: git clc-sdk
       git:
         repo: https://github.com/CenturyLinkCloud/clc-python-sdk.git
         dest: /srv/clc-python-sdk
+      tags:
+        - git_clc_sdk
 
-    - name: pip install git clc-python-sdk
+    - name: pip install clc-python-sdk
       pip:
         name: /srv/clc-python-sdk/src
+      tags:
+        - pip_clc_sdk
 
-    - name: git clc ansible module
+    - name: git clc-ansible-module
       git:
         repo: git://github.com/CenturyLinkCloud/clc-ansible-module.git
-        clone: yes
         dest: /srv/clc-ansible-module
+      tags:
+        - git_clc_ansible
 
-    - name: pip install git clc-python-sdk
+    - name: pip install clc-ansible-module
       pip:
         name: /srv/clc-ansible-module
-
+      tags:
+        - pip_clc_ansible
 
     - name: "Ansible copy files remote to remote"
       copy:
         src: myenv.sh      
         dest: /etc/profile.d
         remote_src: yes
-
+      tags:
+        - myenv
 
