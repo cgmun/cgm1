@@ -1,0 +1,36 @@
+---
+# tasks file for ansible-module-lxd
+- name: Add LXD PPA
+  become: yes
+  apt_repository:
+    repo: 'ppa:ubuntu-lxc/lxd-stable'
+    state: present
+  tags:
+    - lxd
+
+- name: apt - Update and upgrade ubuntu
+  apt:
+    update_cache: yes
+
+- name: Install LXD server packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - "{{ lxd_server_packages }}"
+  tags:
+    - lxd
+
+#- name: Install LXD client packages
+#  become: yes
+#  apt:
+#    name: "{{ item }}"
+#    state: present
+#    update_cache: yes
+#  with_items:
+#    - "{{ lxd_client_packages }}"
+#  tags:
+#    - lxd
+#  when: x=1

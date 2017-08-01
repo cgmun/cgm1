@@ -1,0 +1,5 @@
+---
+# File: Windows.yml - Windows OS variables for Consul
+
+# users
+lxd_user: LocalSystem

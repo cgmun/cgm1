@@ -1,0 +1,7 @@
+---
+# File: RedHat.yml - Red Hat OS variables for Consul
+
+lxd_server_packages:
+  - libselinux-python
+  - git
+  - unzip

@@ -1,0 +1,15 @@
+---
+# Handlers for lxd
+
+- name: restart lxd
+  service: 
+    name=lxd
+    state=restarted
+
+- name: restart lxd-bridge
+  service: 
+    name=lxd-bridge 
+    state=restarted
+
+- name: reconfigure lxd
+  raw: "dpkg-reconfigure -f noninteractive -p medium lxd"

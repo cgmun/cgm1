@@ -1,0 +1,70 @@
+---
+# File: main.yml - Main tasks for Consul
+#
+# Unfortunately, this playbook violates DRY somewhat to handle installation
+# on both non-Windows and Windows systems due to such bad words as casting
+# dicts, and being so over YAML that this stuff just needs to get pitched
+# into the rubbish bin at some point in the immediate future :lol:
+
+
+   
+#############################################################################
+# Tasks for all *NIX operating systems
+#############################################################################
+
+- name: Include OS variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install lxd, zfs, bridge and other software packages
+  include: "{{ ansible_os_family }}.yml"
+  #when: nomad_docker_enable | bool
+
+#- name: Setup zfs pool
+#  include: zfs.yml
+
+#- name: configure lxd to use zfs
+#  command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
+#  when: lxcinfo.rc != 0
+
+#- name: Setup Bridge network
+#  include: bridge.yml
+
+- name: Configure LXD
+  include: lxd-config.yml
+
+- name: list existing lxc images
+  command: "lxc image list"
+  changed_when: false
+  register: imagelist
+
+- name: pre copy lxc images
+  include: "lxc-image-copy.yml current={{ imagelist }} image={{ item.i }} alias={{ item.alias }}"
+  with_items: "{{ lxd_preloadimages }}"
+
+- name: list existing lxc images
+  command: "lxc image list"
+  changed_when: false
+  register: imagelist2
+
+- name: list existing lxc instances
+  command: "lxc list"
+  changed_when: false
+  register: lxclist
+
+- name: preconfigure lxc containers
+  include: "lxc-createcontainers.yml guest={{ outer_item.guest }} template={{ outer_item.template }}"
+  with_items: "{{ lxd_preconfigure }}"
+  loop_control:
+    loop_var: outer_item
+
+#- name: Start LXD
+#  service:
+#    name: lxd
+#    enabled: yes
+#    state: started
+
+
+
+#############################################################################
+# End of tasks for all *NIX operating systems
+#############################################################################

@@ -1,0 +1,7 @@
+---
+# File: Solaris.yml - Solaris OS variables for Consul
+
+lxd_server_packages:
+  - git
+  - unzip
+

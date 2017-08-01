@@ -1,0 +1,46 @@
+---
+# defaults file for ansible-module-lxd
+
+lxd_bridgeconf_ipv4_addr: "10.254.254.1"
+lxd_bridgeconf_ipv4_netmask: "255.255.255.0"
+lxd_bridgeconf_ipv4_network: "10.254.254.1/24"
+lxd_bridgeconf_ipv4_dhcp_range: "10.254.254.2,10.254.254.253"
+lxd_bridgeconf_ipv4_dhcp_max: 252
+lxd_bridgeconf_ipv4_nat: true
+lxd_bridgeconf_ipv6_nat: false
+lxd_bridgeconf_ipv6_proxy: false
+
+lxd_allow_remote: false
+lxd_https_listen_address: "[::]"      # all interfaces on port 8443
+lxd_trust_password: "4trustlxd123" 
+
+lxd_preloadimages:
+#    - { i: 'images:ubuntu/precise', alias: 'ubuntu-12.04' }
+#    - { i: 'images:ubuntu/trusty',  alias: 'ubuntu-14.04' }
+    - { i: 'images:ubuntu/xenial',  alias: 'ubuntu-16.04' }
+#    - { i: 'images:centos/6',       alias: 'centos-6' }
+#    - { i: 'images:centos/7',       alias: 'centos-7' }
+#    - { i: 'images:debian/wheezy',  alias: 'debian-7' }
+#    - { i: 'images:debian/jessie',  alias: 'debian-8' }
+#    - { i: 'images:alpine/3.1',     alias: 'alpine-3.1' }
+#    - { i: 'images:alpine/3.2',     alias: 'alpine-3.2' }
+#    - { i: 'images:alpine/3.3',     alias: 'alpine-3.3' }
+    - { i: 'images:alpine/3.4',     alias: 'alpine-3.4' }
+#    - { i: 'images:alpine/edge',    alias: 'alpine-edge' }
+#    - { i: 'images:fedora/22',      alias: 'fedora-22' }
+#    - { i: 'images:fedora/23',      alias: 'fedora-23' }
+#    - { i: 'images:fedora/24',      alias: 'fedora-24' }
+#    - { i: 'images:gentoo/current', alias: 'gentoo-current' }
+#    - { i: 'images:opensuse/13.2',  alias: 'opensuse-13.2' }
+#    - { i: 'images:oracle/6',       alias: 'oracle-6' }
+#    - { i: 'images:oracle/7',       alias: 'oracle-7' }
+
+# no periods allow, will fail
+lxd_preconfigure: 
+   - { guest: "demo-alpine-34", template: "alpine-3.4" }
+#  - { guest: 'demo-ubuntu-12', template: 'ubuntu-12.04' }
+#  - { guest: 'demo-ubuntu-14', template: 'ubuntu-14.04' }
+#  - { guest: 'demo-ubuntu-16', template: 'ubuntu-16.04' }
+
+lxd_zfs_pool_name: lxd
+
