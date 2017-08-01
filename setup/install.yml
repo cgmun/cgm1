@@ -19,6 +19,10 @@
     - netaddr
     - virtualenv
 
+    ymllist:
+    - /etc/ansible/roles/brianshumate.consul/tasks/install.yml
+    - /etc/ansible/roles/brianshumate.nomad/tasks/install.yml
+    - /etc/ansible/roles/brianshumate.vault/tasks/install.yml
   tasks:
     - name: Apt Install packages
       apt:
@@ -78,14 +82,30 @@
       tags:
         - myenv
 
-    - name: Append validate_certs to hasicorp download
-      shell: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs no/' {{ item }}"
-      run_once: True
+    - name: grep - search validate_certs already added to selected files.
+      command: grep -c validate_certs "{{ item }}"
+      ignore_errors: yes
+      register: grep_results
       with_items:
-      - /etc/ansible/roles/brianshumate.consul/tasks/install.yml
-      - /etc/ansible/roles/brianshumate.nomad/tasks/install.yml
-      - /etc/ansible/roles/brianshumate.vault/tasks/install.yml
+        - "{{ ymllist }}"
       tags:
-        - validate_certs
+        - check_validate_certs
+
+    - name: add validate_certs=no if does not exist
+      command: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs=no/' {{ item.item }}"
+      with_items: "{{ grep_results.results }}"
+      when: "{{ item.rc |int == 1 }}"
+      tags:
+        - add_validate_certs
+
+#    - name: Append validate_certs to hasicorp download
+#      shell: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs no/' {{ item }}"
+#      run_once: True
+#      with_items:
+#      - /etc/ansible/roles/brianshumate.consul/tasks/install.yml
+#      - /etc/ansible/roles/brianshumate.nomad/tasks/install.yml
+#      - /etc/ansible/roles/brianshumate.vault/tasks/install.yml
+#      tags:
+#        - validate_certs
 
 
