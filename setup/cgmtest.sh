@@ -6,10 +6,11 @@
 export oldDir=$PWD
 echo "[CGM] test passing variable"
 
+mgnt_node=$1
+client_node=$2
+
+CLC_V2_API_USERNAME=$3
+CLC_V2_API_PASSWD=$4
 
 ansible_user=root
-ansible_ssh_pass=$1
-CLC_V2_API_USERNAME=$2
-CLC_V2_API_PASSWD=$3
-mgnt_node=$4
-client_node=$5
+ansible_ssh_pass=$5
