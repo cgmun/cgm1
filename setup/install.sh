@@ -72,10 +72,12 @@ createYamlFile () {
 cd ../
 pwd
 
-if [[ ! -e "./property.yml" ]]; then
+if [[ ! -e "../property.yml" ]]; then
   askQuestions
   echoAnswers
   createYamlFile
+else
+  cp ../property.yml .
 fi
 
 echo "[CGM] run site.yml playbook to build hasicorp cluster"
