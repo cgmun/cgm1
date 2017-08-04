@@ -47,9 +47,9 @@
 
 
   roles:
-#    - { role: ssh-keys, tags: ssh-keys }
-#    - { role: os-setup, tags: os-setup }
-#    - { role: kbrebanov.ntp, tags: ntp }
+    - { role: ssh-keys, tags: ssh-keys }
+    - { role: os-setup, tags: os-setup }
+    - { role: kbrebanov.ntp, tags: ntp }
 #    - { role: lxd, tags: lxd }
 #    - { role: andrewrothstein.consul-template, tags: consul-template }
     - {role: brianshumate.consul, tags: 'consul' }
