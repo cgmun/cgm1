@@ -1,5 +1,4 @@
 ---
-
 - name: apt - Update and upgrade ubuntu
   apt:
     upgrade: dist
@@ -13,6 +12,14 @@
   register: job_result
   until: job_result.finished
   retries: 300
+
+#- name: Apt - update
+#  command: apt-get -y update
+#  register: update_output
+
+#- name: Apt - upgrade
+#  command: yes '' | apt upgrade -y
+#  register: apt_upgrade_output
 
 - name: Autoremove - Remove dependencies that are no longer required
   command: apt-get -y autoremove
