@@ -1,0 +1,58 @@
+---
+- name: Install docker helper  packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - software-properties-common
+  tags:
+    - docker
+
+#- name: Add docker GPG key
+#  get_url: 
+#    url: https://download.docker.com/linux/ubuntu/gpg
+#    dest: docker-ce.gpg
+#    mode: 0440
+
+- apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+
+#  command: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#  register: docker_key
+
+- name: Add Docker PPA
+  become: yes
+  apt_repository:
+    repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'
+    state: present
+  tags:
+    - docker
+
+- name: apt - Update ubuntu
+  apt:
+    update_cache: yes
+  register: apt_update
+
+- name: Install docker-ce packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - docker-ce
+  tags:
+    - docker
+
+- name: Autoremove - Remove dependencies that are no longer required
+  command: apt-get -y autoremove
+  register: autoremove_output
+  changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+
+
+

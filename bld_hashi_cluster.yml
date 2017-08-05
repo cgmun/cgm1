@@ -41,19 +41,17 @@
   any_errors_fatal: true
   become: yes
   become_user: root
-#  environment:
-#    CLC_V2_API_USERNAME: "{{ CLC_V2_API_USERNAME}}"
-#    CLC_V2_API_PASSWD: "{{ CLC_V2_API_PASSWD }}"
-
 
   roles:
     - { role: ssh-keys, tags: ssh-keys }
     - { role: os-setup, tags: os-setup }
     - { role: kbrebanov.ntp, tags: ntp }
+    - { role: docker-ce, tags: docker }
+
 #    - { role: lxd, tags: lxd }
 #    - { role: andrewrothstein.consul-template, tags: consul-template }
     - {role: brianshumate.consul, tags: 'consul' }
 #    - {role: brianshumate.vault, tags: 'vault' }
-#    - {role: brianshumate.nomad, tags: 'nomad' }
+    - {role: brianshumate.nomad, tags: 'nomad' }
 #    - { role: lobsterdore.fabio, fabio_version: 1.5.0, tags: 'fabio' }
   
