@@ -1,0 +1,4 @@
+---
+vault_cluster_name: consul
+vault_datacenter: CA3
+
