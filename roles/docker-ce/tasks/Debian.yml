@@ -12,23 +12,16 @@
   tags:
     - docker
 
-#- name: Add docker GPG key
-#  get_url: 
-#    url: https://download.docker.com/linux/ubuntu/gpg
-#    dest: docker-ce.gpg
-#    mode: 0440
-
-- apt_key:
-    url: "https://download.docker.com/linux/ubuntu/gpg"
+- nane: add docker repository key
+  apt_key:
+    url: "{{ apt_key_url }}"
     state: present
+  tags:
+    - docker
 
-#  command: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-#  register: docker_key
-
-- name: Add Docker PPA
-  become: yes
+- name: add docker repository 
   apt_repository:
-    repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'
+    repo: "{{ apt_repository }}"
     state: present
   tags:
     - docker
@@ -37,6 +30,8 @@
   apt:
     update_cache: yes
   register: apt_update
+  tags:
+    - docker
 
 - name: Install docker-ce packages
   become: yes
@@ -49,10 +44,22 @@
   tags:
     - docker
 
-- name: Autoremove - Remove dependencies that are no longer required
-  command: apt-get -y autoremove
-  register: autoremove_output
-  changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+- name: upgrade latest docker-py
+  pip:
+    name: "{{ item.name }}"
+    state: latest
+  with_items:
+    - { name: docker-py, version: "{{ docker_py_version }}", install: "{{ docker_py_install }}" }
+  when: (item.version=="latest" and item.install)
+  tags:
+    - docker
 
+- name: start docker
+  service:
+    name: docker
+    state: started
 
+- name: update facts if docker0 is not defined
+  action: setup filter="ansible_docker0"
+  when: ansible_docker0 is not defined
 
