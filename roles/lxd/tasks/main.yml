@@ -18,6 +18,7 @@
 - name: Install lxd, zfs, bridge and other software packages
   include: "{{ ansible_os_family }}.yml"
   #when: nomad_docker_enable | bool
+  when: server_role == 'client' or server_role == 'both'
 
 #- name: Setup zfs pool
 #  include: zfs.yml
@@ -31,31 +32,37 @@
 
 - name: Configure LXD
   include: lxd-config.yml
+  when: server_role == 'client' or server_role == 'both'
 
 - name: list existing lxc images
   command: "lxc image list"
   changed_when: false
   register: imagelist
+  when: server_role == 'client' or server_role == 'both'
 
 - name: pre copy lxc images
   include: "lxc-image-copy.yml current={{ imagelist }} image={{ item.i }} alias={{ item.alias }}"
   with_items: "{{ lxd_preloadimages }}"
+  when: server_role == 'client' or server_role == 'both'
 
 - name: list existing lxc images
   command: "lxc image list"
   changed_when: false
   register: imagelist2
+  when: server_role == 'client' or server_role == 'both'
 
 - name: list existing lxc instances
   command: "lxc list"
   changed_when: false
   register: lxclist
+  when: server_role == 'client' or server_role == 'both'
 
 - name: preconfigure lxc containers
   include: "lxc-createcontainers.yml guest={{ outer_item.guest }} template={{ outer_item.template }}"
   with_items: "{{ lxd_preconfigure }}"
   loop_control:
     loop_var: outer_item
+  when: server_role == 'client' or server_role == 'both'
 
 #- name: Start LXD
 #  service:

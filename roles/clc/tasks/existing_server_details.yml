@@ -67,7 +67,7 @@
     ansible_host: "{{ item.value.ip }}"
     ansible_user: root
     ansible_ssh_pass: "{{ item.value.password }}"
-    cluster_role: management
+    server_role: management
     consul_node_role: server
     consul_bootstrap_expect: true
     lxd_node_role: client
@@ -83,7 +83,7 @@
     ansible_host: "{{ item.value.ip }}"
     ansible_user: root
     ansible_ssh_pass: "{{ item.value.password }}"
-    cluster_role: client
+    server_role: client
     consul_node_role: client
     lxd_node_role: server
     nomad_node_role: client

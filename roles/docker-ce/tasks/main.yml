@@ -1,7 +1,15 @@
 ---
+
+# install on client server or both server_role 
 - include: Debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: server_role == 'client' or server_role == 'both'
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: server_role == 'client' or server_role == 'both'
+
+
+# add docker client stuff here
+#  when: server_role == 'management' or server_role == 'both'
 
