@@ -13,33 +13,16 @@
   until: job_result.finished
   retries: 300
 
-#- name: Apt - update
-#  command: apt-get -y update
-#  register: update_output
-
-#- name: Apt - upgrade
-#  command: yes '' | apt upgrade -y
-#  register: apt_upgrade_output
-
 - name: Autoremove - Remove dependencies that are no longer required
   command: apt-get -y autoremove
   register: autoremove_output
   changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
 
-#- name: apt - Remove dependencies that are no longer required
-#  shell: apt autoremove -y
-#  register: apt-autoremove
-#  ignore_errors: true
-
-#  apt:
-#    autoremove: yes
-
-#- name: Run the equivalent of "apt-get update" as a separate step
-#  apt:
-#    update_cache: yes
-    
-#- name: Update all packages to the latest version
-#  apt:
-#    upgrade: dist
-
+- name: Apt Install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ apt_packages }}"
+  register: apt_results
 

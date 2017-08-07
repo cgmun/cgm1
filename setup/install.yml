@@ -12,6 +12,7 @@
     - python-pip
     - python-netaddr
     - redis-server
+    - apt-transport-https
 
     pip_packages:
     - jupyter

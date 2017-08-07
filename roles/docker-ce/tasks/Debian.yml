@@ -12,7 +12,7 @@
   tags:
     - docker
 
-- nane: add docker repository key
+- name: add docker repository key
   apt_key:
     url: "{{ apt_key_url }}"
     state: present
