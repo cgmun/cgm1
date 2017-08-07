@@ -11,6 +11,7 @@
     - vim-nox-py2
     - python-pip
     - python-netaddr
+    - redis-server
 
     pip_packages:
     - jupyter
@@ -18,6 +19,7 @@
     - boto
     - netaddr
     - virtualenv
+    - redis
 
     ymllist:
     - /etc/ansible/roles/brianshumate.consul/tasks/install.yml

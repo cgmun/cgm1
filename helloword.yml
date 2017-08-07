@@ -1,0 +1,24 @@
+---
+- name: Hello Wolrd
+  hosts: localhost 
+  gather_facts: true
+  tasks:
+    - name: Say Hello
+      shell: echo "Hello World!"
+
+    - name: ansible_distribution_release
+      debug: var=hostvars['localhost']['ansible_nodename']
+
+    - name: localhost facts 
+      debug: var=hostvars['localhost']
+
+    - name: localhost facts 
+      debug: var=hostvar
+
+#"{{ ansible_os_family }}"
+
+# {{ hostvars['localhost']['ansible_os_family'] }}
+
+#hostvars.localhost.all_servers
+
+# ansible_distribution_release
