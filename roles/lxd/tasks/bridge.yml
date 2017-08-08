@@ -1,3 +1,4 @@
+---
 - name: configure lxd bridge
   template: src=lxd-bridge.j2 dest=/etc/default/lxd-bridge mode=0644 backup=yes
   notify:

@@ -20,19 +20,23 @@
   #when: nomad_docker_enable | bool
   when: server_role == 'client' or server_role == 'both'
 
-#- name: Setup zfs pool
-#  include: zfs.yml
+- name: Setup zfs pool
+  include: zfs.yml
+  when: server_role == 'client' or server_role == 'both'
 
 #- name: configure lxd to use zfs
 #  command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
 #  when: lxcinfo.rc != 0
 
-#- name: Setup Bridge network
-#  include: bridge.yml
+- name: Setup Bridge network
+  include: bridge.yml
+  when: server_role == 'client' or server_role == 'both'
 
 - name: Configure LXD
   include: lxd-config.yml
   when: server_role == 'client' or server_role == 'both'
+
+#get images and create container
 
 - name: list existing lxc images
   command: "lxc image list"

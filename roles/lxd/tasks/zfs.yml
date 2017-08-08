@@ -9,18 +9,29 @@
 
 - name: create zfs file for lxd of 10GB
   command: "truncate -s 10G /usr/lib/lxd/zfs.img"
-  when: zfspool.rc != 0
+  when: zfspool.rc|int != 0
 
 - name: create new zpool for lxd
   command: "zpool create {{ lxd_zfs_pool_name }} /usr/lib/lxd/zfs.img"
-  when: zfspool.rc != 0
+  when: zfspool.rc|int != 0
 
-- name: verify if lxd is configured to use ZFS
-  shell: lxc info | grep storage | grep zfs
+#- name: verify if lxd is configured to use ZFS
+#  shell: lxc info | grep storage | grep zfs
+#  register: lxcinfo
+#  ignore_errors: true
+
+- name: check if zfs pool setup in lxd
+  shell: "lxc storage show default"
   register: lxcinfo
   ignore_errors: true
 
+- name: lxcinfo result
+  debug: var=lxcinfo
+
+- name: lxxd zfs pool
+  debug: var=lxd_zfs_pool_name
+
 - name: configure lxd to use zfs
   command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
-  when: lxcinfo.rc != 0
+  when: lxcinfo.rc|int != 0
 
