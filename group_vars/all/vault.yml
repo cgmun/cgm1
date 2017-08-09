@@ -2,3 +2,4 @@
 vault_cluster_name: consul
 vault_datacenter: CA3
 vault_iface: ens160
+#vault_address: 0.0.0.0
