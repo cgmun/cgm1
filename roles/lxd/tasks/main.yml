@@ -60,11 +60,13 @@
   changed_when: false
   register: lxclist
   when: server_role == 'client' or server_role == 'both'
+  ignore_errors: yes
 
-#- name: preconfigure lxc containers cli
-#  command: "lxc launch images:alpine/3.5 alpine-demo"
-#  register: lxclaunch
-#  when: server_role == 'client' or server_role == 'both' and lxclist.rc|int != 0
+- name: preconfigure lxc containers cli
+  command: "lxc launch images:alpine/3.5 alpine-demo"
+  register: lxclaunch
+  when: server_role == 'client' or server_role == 'both' and lxclist.rc|int != 0
+  ignore_errors: yes
 
 #  when: lxclist.rc|int != 0
 
