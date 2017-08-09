@@ -1,0 +1,79 @@
+ps -ef |grep lxd
+
+
+lxd 
+STORAGE
+
+create - lxc storage create lxd zfs
+
+lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
+
+assign storage pool to default profile
+
+lxc profile device add default root disk path=/ pool=lxd size=2GBb
+
+
+ex.
+lxc storage create pool1 zfs source=/dev/sdX
+lxc storage create pool1 zfs source=/dev/sdX zfs.pool_name=my-tank
+
+
+NETWORK
+
+lxc network create testbr0 ipv6.address=none ipv4.address=10.0.3.1/24 ipv4.nat=true
+
+ lxc network show testbr0
+
+
+LXD_DOMAIN="lxd"
+
+lxc launch images:alpine/3.5 a2
+
+
+
+get unused /dev/sdX
+
+all_FS=$(fdisk -l 2>/dev/null | grep "Disk \/" | grep -v "\/dev\/ram" | awk -F'[ :]' '{print $2}')
+
+active_fs=$(blkid |cut -d: -f1)
+	/dev/sdb /dev/sda1 /dev/sdc
+
+unprted sdd
+root@CA3DAQANODE57:/proc# parted -ml
+BYT;
+/dev/sda:539MB:scsi:512:512:msdos:VMware Virtual disk:;
+1:1049kB:512MB:511MB:ext4::boot;
+
+BYT;
+/dev/sdb:2147MB:scsi:512:512:loop:VMware Virtual disk:;
+1:0.00B:2147MB:2147MB:linux-swap(v1)::;
+
+BYT;
+/dev/sdc:15.0GB:scsi:512:512:loop:VMware Virtual disk:;
+1:0.00B:15.0GB:15.0GB:ext4::;
+
+Error: /dev/sdd: unrecognised disk label
+BYT;                                                                      
+/dev/sdd:10.7GB:scsi:512:512:unknown:VMware Virtual disk:;
+
+
+with sdd - zfs
+root@CA3DAQANODE58:/proc# parted -ml
+BYT;
+/dev/sda:539MB:scsi:512:512:msdos:VMware Virtual disk:;
+1:1049kB:512MB:511MB:ext4::boot;
+
+BYT;
+/dev/sdb:2147MB:scsi:512:512:loop:VMware Virtual disk:;
+1:0.00B:2147MB:2147MB:linux-swap(v1)::;
+
+BYT;
+/dev/sdc:15.0GB:scsi:512:512:loop:VMware Virtual disk:;
+1:0.00B:15.0GB:15.0GB:ext4::;
+
+BYT;
+/dev/sdd:16.1GB:scsi:512:512:gpt:VMware Virtual disk:;
+1:1049kB:16.1GB:16.1GB::zfs-2f9e18c98a59f26f:;
+9:16.1GB:16.1GB:8389kB:::;
+
+
