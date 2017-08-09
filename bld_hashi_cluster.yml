@@ -6,9 +6,14 @@
   gather_facts: true
   connection: local
   tasks:
-    - name: remove known_hosts file
-      shell: rm -f ~/.ssh/known_hosts
-      ignore_errors: yes
+    - name: Clean artifact path
+      file:
+        state: absent
+        path: ~/.ssh/known_hosts
+
+#    - name: remove known_hosts file
+#      shell: rm -f ~/.ssh/known_hosts
+#      ignore_errors: yes
   roles:
     - { role: clc, tags: ['create_server'] }
 
@@ -47,11 +52,10 @@
     - { role: os-setup, tags: os-setup }
     - { role: kbrebanov.ntp, tags: ntp }
     - { role: docker-ce, tags: docker }
-
-#    - { role: lxd, tags: lxd }
-#    - { role: andrewrothstein.consul-template, tags: consul-template }
+    - { role: lxd, tags: lxd }
+    - { role: andrewrothstein.consul-template, tags: consul-template }
     - {role: brianshumate.consul, tags: 'consul' }
-#    - {role: brianshumate.vault, tags: 'vault' }
+    - {role: brianshumate.vault, tags: 'vault' }
     - {role: brianshumate.nomad, tags: 'nomad' }
 #    - { role: lobsterdore.fabio, fabio_version: 1.5.0, tags: 'fabio' }
   

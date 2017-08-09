@@ -73,6 +73,7 @@
     lxd_node_role: client
     nomad_node_role: server 
     nomad_advertise_address: "{{ item.value.ip }}"
+    vault_address: "{{ item.value.ip }}"
     groups: consul_instances, nomad_instances
   when: mgmt_server_count|int > 1 and item.value.role == 'mgmt'
   with_dict: "{{ all_servers }}"
@@ -89,6 +90,7 @@
     nomad_node_role: client
     nomad_no_host_uuid: true
     nomad_advertise_address: "{{ item.value.ip }}"
+    vault_address: "{{ item.value.ip }}"
     groups: consul_instances, nomad_instances
   when: node_server_count|int > 1 and item.value.role == 'node'
   with_dict: "{{ all_servers }}"
