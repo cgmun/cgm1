@@ -90,14 +90,14 @@
 - name: Debug -  mgmt_server_count
   debug: var=mgmt_server_count
 
-#- name: Debug - mgmt_grp_id
-#  debug: var=mgmt_grp_id
+- name: Debug - mgmt_grp_id
+  debug: var=mgmt_grp_id
 
 - name: Debug -  node_server_count
   debug: var=node_server_count
 
-#- name: Debug - node_grp_id
-#  debug: var=node_grp_id
+- name: Debug - node_grp_id
+  debug: var=node_grp_id
 
 - name: Cluster MGMT server count 
   debug: 

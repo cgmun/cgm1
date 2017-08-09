@@ -1,10 +1,8 @@
 ---
 # File: Debian.yml - Debian OS variables for Consul
 lxd_server_packages:
-  - git
-  - unzip
   - lxd
-  - lxd-tools
+#  - lxd-tools
   - zfsutils-linux
   - bridge-utils
 

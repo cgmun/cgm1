@@ -48,7 +48,7 @@
 - name: DEBUG - node_servers_list
   debug: var=node_servers_list
 
-- name: store all mgtmt Servers ipaddress and Credentials in all_servers dict for mgmt
+- name: store all mgmt Servers ipaddress and Credentials in all_servers dict for mgmt
   set_fact:
     all_servers: "{{ all_servers|default({}) | combine( {item.server.name : {'id': item.server.name, 'ip': item.server.ipaddress, 'password': item.server.credentials.password, 'role': 'mgmt' }} ) }}"
   with_items: "{{mgmt_servers_details.results|sort}}"

@@ -44,15 +44,15 @@
   tags:
     - docker
 
-- name: upgrade latest docker-py
-  pip:
-    name: "{{ item.name }}"
-    state: latest
-  with_items:
-    - { name: docker-py, version: "{{ docker_py_version }}", install: "{{ docker_py_install }}" }
-  when: (item.version=="latest" and item.install)
-  tags:
-    - docker
+#- name: upgrade latest docker-py
+#  pip:
+#    name: "{{ item.name }}"
+#    state: latest
+#  with_items:
+#    - { name: docker-py, version: "{{ docker_py_version }}", install: "{{ docker_py_install }}" }
+#  when: (item.version=="latest" and item.install)
+#  tags:
+#    - docker
 
 - name: start docker
   service:
