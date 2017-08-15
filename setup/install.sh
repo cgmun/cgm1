@@ -78,7 +78,10 @@ if [[ ! -e "../property.yml" ]]; then
   createYamlFile
 else
   cp ../property.yml .
+  echo "[CGM] run site.yml playbook to build hasicorp cluster"
+  #ansible-playbook bld_hashi_cluster.yml -e "@property.yml"
+  ./runbook
 fi
 
-echo "[CGM] run site.yml playbook to build hasicorp cluster"
-ansible-playbook bld_hashi_cluster.yml -e "@property.yml"
+#echo "[CGM] run site.yml playbook to build hasicorp cluster"
+#ansible-playbook bld_hashi_cluster.yml -e "@property.yml"

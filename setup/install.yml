@@ -99,16 +99,16 @@
         - check_validate_certs
 
     - name: add validate_certs=no if does not exist
-      command: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs=no/' {{ item.item }}"
+      shell: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs=no/' {{ item.item }}"
       with_items: "{{ grep_results.results }}"
       when: "{{ item.rc |int == 1 }}"
       tags:
         - add_validate_certs
 
     - name: add nomad docker install on client server 
-      command: "sed -i '/^  when: nomad_docker_enable/ s/$/ and server_role == \"client\" or server_role == \"both\"/' {{ item.item }}"
-      with_items: "{{ grep_results.results }}"
-      when: "{{ item.rc |int == 1 }}"
+      shell: "sed -i '/^  when: nomad_docker_enable/ s/$/ and server_role == \"client\" or server_role == \"both\"/' {{ item }}"
+      with_items: 
+        - "{{ dockerlist }}"
       tags:
         - add_nomad_docker_client
 
