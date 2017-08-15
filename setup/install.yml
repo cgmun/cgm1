@@ -99,16 +99,30 @@
         - check_validate_certs
 
     - name: add validate_certs=no if does not exist
-      shell: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs=no/' {{ item.item }}"
+      command: "sed -i '/^  local_action: get_url url/ s/$/ validate_certs=no/' {{ item.item }}"
       with_items: "{{ grep_results.results }}"
       when: "{{ item.rc |int == 1 }}"
       tags:
         - add_validate_certs
 
-    - name: add nomad docker install on client server 
-      shell: "sed -i '/^  when: nomad_docker_enable/ s/$/ and server_role == \"client\" or server_role == \"both\"/' {{ item }}"
-      with_items: 
+    - name: grep - docker group nomad already added to selected files.
+      command: " grep -c nomad_docker_enable {{ item }}"
+      ignore_errors: yes
+      register: docker_grep_results
+      with_items:
         - "{{ dockerlist }}"
+      tags:
+        - check_nomad_docker
+
+    - name: docker_grep_results.results
+      debug:
+        var: docker_grep_results.results
+
+    - name: add nomad docker install on client server 
+      shell: "sed -i '/^  when: nomad_docker_enable/ s/$/ and server_role == \"client\" or server_role == \"both\"/' {{ item.item }}"
+      with_items: 
+        - "{{ docker_grep_results.results }}"
+      when: "{{ item.stdout |int == 1 }}"
       tags:
         - add_nomad_docker_client
 
