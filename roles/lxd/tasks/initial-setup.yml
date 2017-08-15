@@ -63,7 +63,7 @@
   debug: var=zfspool
 
 - name: create zfs storage pool
-  command: lxc storage create {{ lxd_zfs_pool_name }} zfs source={{ raw_disk.stdout }}
+  command: lxc storage create {{ lxd_zfs_pool_name }} zfs "source={{ raw_disk.stdout }}"
   register: lxc_create_zfs_pool
   when: zfspool.rc|int != 0
   ignore_errors: true
