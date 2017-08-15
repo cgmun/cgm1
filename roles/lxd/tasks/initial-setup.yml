@@ -8,8 +8,12 @@
 #  when: lxdconf.changed and (ansible_virtualization_type is not defined or ansible_virtualization_type != "lxc")
 
 - name: get raw unused disk for zfs pool
-  command: "parted -ml 2>&1 |grep Error |cut -d: -f2"
+  shell: "parted -ml 2>&1 |grep Error |cut -d: -f2"
   register: raw_disk
+
+- name: debug raw_disk
+  debug:
+    var: raw_disk
 
 - name: setfacts lxd_zfs_pool_name
   set_fact:
@@ -59,7 +63,7 @@
   debug: var=zfspool
 
 - name: create zfs storage pool
-  command: lxc storage create {{ lxd_zfs_pool_name }} zfs source={{ raw_disk }}
+  command: lxc storage create {{ lxd_zfs_pool_name }} zfs source={{ raw_disk.stdout }}
   register: lxc_create_zfs_pool
   when: zfspool.rc|int != 0
   ignore_errors: true
