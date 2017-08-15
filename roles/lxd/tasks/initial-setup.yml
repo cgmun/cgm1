@@ -17,22 +17,34 @@
   set_fact:
     lxd_zfs_pool_name: lxdpool1
     lxd_bridge_name: testbr0
-- name: 
-  command: lxc network show testbr0
+
+- name: lxc network show 
+  command: lxc network show {{ lxd_bridge_name }}
   register: lxd_network_exist
   ignore_errors: true
 
 # Bridge setup
 - name: create initial lxd bridge
-  command: lxc network create testbr0 ipv6.address=none ipv4.address=10.0.3.1/24 ipv4.nat=true dns.domain=cgm
+  command: lxc network create {{ lxd_bridge_name }} ipv6.address=none ipv4.address=10.0.3.1/24 ipv4.nat=true dns.domain=cgm
   register: lxc_create_bridge_profile
   when: lxd_network_exist.rc|int != 0
   ignore_errors: true
 
+- name: check if bridge is attach to default profile
+  command: lxc profile show default |grep {{ lxd_bridge_name }}
+  register: lxc_info_bridge_profile
+  #when: lxd_network_exist.rc|int != 0
+  ignore_errors: true
+
+- name: debug lxd_network_exist
+  debug:
+    var: lxd_network_exist
+
 - name: add lxd bridge to default profile
-  command: lxc network attach-profile testbr0 default eth0
+  command: lxc network attach-profile {{ lxd_bridge_name }} default eth0
   register: lxc_add_bridge_profile
-  when: lxc_create_bridge_profile.rc|int == 0
+  #when: lxc_create_bridge_profile.rc|int == 0 and 
+  when: lxc_info_bridge_profile|int != 0
   ignore_errors: true
 
 # ZFS setup
@@ -48,13 +60,19 @@
 - name: create zfs storage pool
   command: lxc storage create {{ lxd_zfs_pool_name }} zfs source=/dev/sdd
   register: lxc_create_zfs_pool
-  when: lxc_create_zfs_pool.rc|int != 0
+  when: zfspool.rc|int != 0
   ignore_errors: true
 
-- name:
+- name: check if zfs pool is attached default profile
+  command: lxc profile show default |grep {{ lxd_zfs_pool_name }}
+  register: lxc_info_zfs_pool_profile
+  #when: lxd_network_exist.rc|int != 0
+  ignore_errors: true
+
+- name: attach zfs pool to default profile
   command: lxc profile device add default root disk path=/ pool={{ lxd_zfs_pool_name }}
   register: lxc_add_zfs_profile
-  when: lxc_create_zfs_pool.rc|int == 0
+  when: lxc_info_zfs_pool_profile.rc|int != 0
   ignore_errors: true
 
 #- name: create zfs file for lxd of 10GB
