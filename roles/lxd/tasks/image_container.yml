@@ -15,7 +15,7 @@
 #get images and create container
 
 - name: list existing lxc images
-  command: "lxc image list"
+  shell: "lxc image list"
   changed_when: false
   register: imagelist
   #when: server_role == 'client' or server_role == 'both'
@@ -23,26 +23,22 @@
 - name: pre copy lxc images
   include: "lxc-image-copy.yml current={{ imagelist }} image={{ item.i }} alias={{ item.alias }}"
   with_items: "{{ lxd_preloadimages }}"
-  #when: server_role == 'client' or server_role == 'both'
 
 - name: list existing lxc images
-  command: "lxc image list"
+  shell: "lxc image list"
   changed_when: false
   register: imagelist2
-  #when: server_role == 'client' or server_role == 'both'
 
 - name: list existing lxc instances
-  command: "lxc info alpine-demo"
+  shell: "lxc info alpine-demo"
   changed_when: false
   register: lxclist
-  #when: server_role == 'client' or server_role == 'both'
   ignore_errors: yes
 
 - name: preconfigure lxc containers cli
-  command: "lxc launch images:alpine/3.5 alpine-demo"
+  shell: "lxc launch images:alpine/3.5 alpine-demo"
   register: lxclaunch
   when: lxclist.rc|int != 0
-  #when: server_role == 'client' or server_role == 'both' and lxclist.rc|int != 0
   ignore_errors: yes
   when: lxclist.rc|int != 0
 

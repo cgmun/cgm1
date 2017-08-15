@@ -37,9 +37,8 @@
   ignore_errors: true
 
 - name: check if bridge is attach to default profile
-  command: lxc profile show default |grep {{ lxd_bridge_name }}
+  shell: "lxc profile show default|grep -c {{ lxd_bridge_name }}"
   register: lxc_info_bridge_profile
-  #when: lxd_network_exist.rc|int != 0
   ignore_errors: true
 
 - name: debug lxc_info_bridge_profile
@@ -49,7 +48,7 @@
 - name: add lxd bridge to default profile
   command: lxc network attach-profile {{ lxd_bridge_name }} default eth0
   register: lxc_add_bridge_profile
-  when: lxc_info_bridge_profile|int != 0
+  when: lxc_info_bridge_profile.stdout|int == 0
   ignore_errors: true
 
 # ZFS setup
@@ -69,7 +68,7 @@
   ignore_errors: true
 
 - name: check if zfs pool is attached default profile
-  command: lxc profile show default |grep {{ lxd_zfs_pool_name }}
+  shell: "lxc profile show default|grep -c {{ lxd_zfs_pool_name }}"
   register: lxc_info_zfs_pool_profile
   ignore_errors: true
 
@@ -80,6 +79,6 @@
 - name: attach zfs pool to default profile
   command: lxc profile device add default root disk path=/ pool={{ lxd_zfs_pool_name }}
   register: lxc_add_zfs_profile
-  when: lxc_info_zfs_pool_profile.rc|int != 0
+  when: lxc_info_zfs_pool_profile.stdout|int == 0
   ignore_errors: true
 
