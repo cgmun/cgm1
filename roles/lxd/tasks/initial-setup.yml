@@ -8,7 +8,7 @@
 #  when: lxdconf.changed and (ansible_virtualization_type is not defined or ansible_virtualization_type != "lxc")
 
 - name: get raw unused disk for zfs pool
-  command: parted -ml 2>&1 |grep Error |cut -d: -f2
+  command: "parted -ml 2>&1 |grep Error |cut -d: -f2"
   register: raw_disk
 
 - name: setfacts lxd_zfs_pool_name
