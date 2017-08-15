@@ -29,6 +29,10 @@
   connection: local
   roles:
     - { role: hosts_files, tags: localhost_hosts_files, host_servers: "{{ hostvars.localhost.all_servers }}" }
+  tasks: 
+    - name: print all groups info
+      debug:
+        msg: "{{ groups }}"
 
 - name: Assemble Consul, Nomad, dnsmasq, docker cluster
   hosts: cluster_nodes
@@ -48,5 +52,6 @@
     - { role: brianshumate.consul, tags: 'consul' }
     - { role: brianshumate.vault, tags: 'vault' }
     - { role: brianshumate.nomad, tags: 'nomad' }
+
 #    - { role: lobsterdore.fabio, fabio_version: 1.5.0, tags: 'fabio' }
   

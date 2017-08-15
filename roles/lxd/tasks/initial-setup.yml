@@ -1,0 +1,74 @@
+---
+#- name: configure lxd bridge
+#  template: src=lxd-bridge.j2 dest=/etc/default/lxd-bridge mode=0644 backup=yes
+#  notify:
+#    - reconfigure lxd
+#    - restart lxd-bridge
+#  register: lxdconf
+
+#- name: force restart of lxd to have working network
+#  service: name=lxd state=restarted
+#  notify:
+#    - reconfigure lxd
+#    - restart lxd-bridge
+#  when: lxdconf.changed and (ansible_virtualization_type is not defined or ansible_virtualization_type != "lxc")
+
+# Bridge setup
+- name: create initial lxd bridge
+  command: "{{ lxd_lxc_path }}"  network create testbr0 ipv6.address=none ipv4.address=10.0.3.1/24 ipv4.nat=true dns.domain=cgm
+  register: lxc_create_bridge_profile
+  ignore_errors: true
+
+- name: add lxd bridge to default profile
+  command: "{{ lxd_lxc_path }}" network attach-profile testbr0 default eth0
+  register: lxc_add_bridge_profile
+  ignore_errors: true
+
+# ZFS setup
+- name: create zfs storage pool
+  command: lxc storage create lxdpool1 zfs source=/dev/sdd
+  register: lxc_create_zfs_pool
+  ignore_errors: true
+
+- name:
+  command: lxc profile device add default root disk path=/ pool=lxdpool1
+  register: lxc_add_zfs_profile
+  ignore_errors: true
+
+- name: verify if ZFS pool exists
+  shell: zpool list {{ lxd_zfs_pool_name }}
+  register: zfspool
+  ignore_errors: true
+
+- name: print zfspool
+  debug: var=zfspool
+
+#- name: create zfs file for lxd of 10GB
+#  command: "truncate -s 10G /usr/lib/lxd/zfs.img"
+#  when: zfspool.rc|int != 0
+
+#- name: create new zpool for lxd
+#  command: "zpool create {{ lxd_zfs_pool_name }} /usr/lib/lxd/zfs.img"
+#  when: zfspool.rc|int != 0
+
+#- name: verify if lxd is configured to use ZFS
+#  shell: lxc info | grep storage | grep zfs
+#  register: lxcinfo
+#  ignore_errors: true
+
+- name: check if zfs pool setup in lxd
+  shell: "lxc storage show default"
+  register: lxcinfo
+  ignore_errors: true
+
+- name: lxcinfo result
+  debug: var=lxcinfo
+
+- name: lxxd zfs pool
+  debug: var=lxd_zfs_pool_name
+
+#- name: configure lxd to use zfs
+#  command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
+#  when: lxcinfo.rc|int != 0
+
+

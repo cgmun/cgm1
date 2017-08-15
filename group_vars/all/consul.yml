@@ -9,6 +9,7 @@ consul_dnsmasq_enable : true
 consul_acl_enable: false
 consul_acl_datacenter: CA3
 consul_acl_master_token_display: true
+consul_group_name: cluster_nodes
 #consul_version
 #consul_control_count: 3
 #hashi_mgmt_count: 3

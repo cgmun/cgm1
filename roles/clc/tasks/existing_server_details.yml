@@ -17,13 +17,23 @@
     group_id: "{{node_grp_id}}"
   register: node_grp_details
 
+- name: debug mgmt_grp_details
+  debug:
+    var: mgmt_grp_details
+
+- name: debug node_grp_details
+  debug:
+    var: node_grp_details
+
 - name: get - mgmt_servers_list
   set_fact:
-    mgmt_servers_list: "{{mgmt_grp_details.group.servers}}"
+    mgmt_servers_list: "{{ mgmt_grp_details.group.servers}}"
+    mgmt_server_count: "{{ mgmt_grp_details.group.serversCount }}"
 
 - name: get - node_servers_list
   set_fact:
-    node_servers_list: "{{node_grp_details.group.servers}}"
+    node_servers_list: "{{ node_grp_details.group.servers }}"
+    node_server_count: "{{ node_grp_details.group.serversCount }}"
 
 - name: clc_server_fact get mgmt servers info
   environment:
@@ -73,7 +83,8 @@
     nomad_node_role: server 
     nomad_advertise_address: "{{ item.value.ip }}"
     vault_address: "{{ item.value.ip }}"
-    groups: cluster_nodes, consul_instances, nomad_instances
+    groups: cluster_nodes, mgmt_nodes
+    #, consul_instances, nomad_instances
   when: mgmt_server_count|int > 1 and item.value.role == 'mgmt'
   with_dict: "{{ all_servers }}"
 
@@ -88,8 +99,10 @@
     nomad_node_role: client
     nomad_no_host_uuid: true
     nomad_advertise_address: "{{ item.value.ip }}"
-    vault_address: "{{ item.value.ip }}"
-    groups: cluster_nodes, consul_instances, nomad_instances
+    vault_address:  127.0.0.1
+    #vault_address: "{{ item.value.ip }}"
+    groups: cluster_nodes, client_nodes
+    #, consul_instances, nomad_instances
   when: node_server_count|int > 1 and item.value.role == 'node'
   with_dict: "{{ all_servers }}"
 

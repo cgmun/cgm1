@@ -20,69 +20,19 @@
   #when: nomad_docker_enable | bool
   when: server_role == 'client' or server_role == 'both'
 
-- name: Setup zfs pool
-  include: zfs.yml
+- name: Include initial setup bridge, zfs
+  include: initial-setup.yml
   when: server_role == 'client' or server_role == 'both'
 
-#- name: configure lxd to use zfs
-#  command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
-#  when: lxcinfo.rc != 0
-
-- name: Setup Bridge network
-  include: bridge.yml
+- name: Include lxd add images, create demo container
+  include: image_container.yml
   when: server_role == 'client' or server_role == 'both'
-
-- name: Configure LXD
-  include: lxd-config.yml
-  when: server_role == 'client' or server_role == 'both'
-
-#get images and create container
-
-- name: list existing lxc images
-  command: "lxc image list"
-  changed_when: false
-  register: imagelist
-  when: server_role == 'client' or server_role == 'both'
-
-- name: pre copy lxc images
-  include: "lxc-image-copy.yml current={{ imagelist }} image={{ item.i }} alias={{ item.alias }}"
-  with_items: "{{ lxd_preloadimages }}"
-  when: server_role == 'client' or server_role == 'both'
-
-- name: list existing lxc images
-  command: "lxc image list"
-  changed_when: false
-  register: imagelist2
-  when: server_role == 'client' or server_role == 'both'
-
-- name: list existing lxc instances
-  command: "lxc info alpine-demo"
-  changed_when: false
-  register: lxclist
-  when: server_role == 'client' or server_role == 'both'
-  ignore_errors: yes
-
-- name: preconfigure lxc containers cli
-  command: "lxc launch images:alpine/3.5 alpine-demo"
-  register: lxclaunch
-  when: server_role == 'client' or server_role == 'both' and lxclist.rc|int != 0
-  ignore_errors: yes
-
-#  when: lxclist.rc|int != 0
-
-#- name: preconfigure lxc containers
-#  include: "lxc-createcontainers.yml guest={{ outer_item.guest }} template={{ outer_item.template }}"
-#  with_items: "{{ lxd_preconfigure }}"
-#  loop_control:
-#    loop_var: outer_item
-#  when: server_role == 'client' or server_role == 'both'
 
 #- name: Start LXD
 #  service:
 #    name: lxd
 #    enabled: yes
 #    state: started
-
 
 
 #############################################################################
