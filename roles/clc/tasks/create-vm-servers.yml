@@ -42,6 +42,8 @@
     exact_count: "{{ hashi_node_count }}"
     cpu: 2
     memory: 2
+    additional_disks:
+      - {sizeGB: 20, type: raw}
     group: "{{ consul_domain }}-nodes"
     location: "{{ consul_datacenter }}"
     #state: "present"

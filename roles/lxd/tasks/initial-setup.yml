@@ -1,10 +1,4 @@
 ---
-#- name: configure lxd bridge
-#  template: src=lxd-bridge.j2 dest=/etc/default/lxd-bridge mode=0644 backup=yes
-#  notify:
-#    - reconfigure lxd
-#    - restart lxd-bridge
-#  register: lxdconf
 
 #- name: force restart of lxd to have working network
 #  service: name=lxd state=restarted
@@ -12,6 +6,10 @@
 #    - reconfigure lxd
 #    - restart lxd-bridge
 #  when: lxdconf.changed and (ansible_virtualization_type is not defined or ansible_virtualization_type != "lxc")
+
+- name: get raw unused disk for zfs pool
+  command: parted -ml 2>&1 |grep Error |cut -d: -f2
+  register: raw_disk
 
 - name: setfacts lxd_zfs_pool_name
   set_fact:
@@ -22,6 +20,10 @@
   command: lxc network show {{ lxd_bridge_name }}
   register: lxd_network_exist
   ignore_errors: true
+
+- name: debug lxd_network_exist
+  debug:
+    var: lxd_network_exist
 
 # Bridge setup
 - name: create initial lxd bridge
@@ -36,14 +38,13 @@
   #when: lxd_network_exist.rc|int != 0
   ignore_errors: true
 
-- name: debug lxd_network_exist
+- name: debug lxc_info_bridge_profile
   debug:
-    var: lxd_network_exist
+    var: lxc_info_bridge_profile
 
 - name: add lxd bridge to default profile
   command: lxc network attach-profile {{ lxd_bridge_name }} default eth0
   register: lxc_add_bridge_profile
-  #when: lxc_create_bridge_profile.rc|int == 0 and 
   when: lxc_info_bridge_profile|int != 0
   ignore_errors: true
 
@@ -58,7 +59,7 @@
   debug: var=zfspool
 
 - name: create zfs storage pool
-  command: lxc storage create {{ lxd_zfs_pool_name }} zfs source=/dev/sdd
+  command: lxc storage create {{ lxd_zfs_pool_name }} zfs source={{ raw_disk }}
   register: lxc_create_zfs_pool
   when: zfspool.rc|int != 0
   ignore_errors: true
@@ -66,41 +67,15 @@
 - name: check if zfs pool is attached default profile
   command: lxc profile show default |grep {{ lxd_zfs_pool_name }}
   register: lxc_info_zfs_pool_profile
-  #when: lxd_network_exist.rc|int != 0
   ignore_errors: true
+
+- name: debug lxc_info_zfs_pool_profile
+  debug: 
+    var: lxc_info_zfs_pool_profile
 
 - name: attach zfs pool to default profile
   command: lxc profile device add default root disk path=/ pool={{ lxd_zfs_pool_name }}
   register: lxc_add_zfs_profile
   when: lxc_info_zfs_pool_profile.rc|int != 0
   ignore_errors: true
-
-#- name: create zfs file for lxd of 10GB
-#  command: "truncate -s 10G /usr/lib/lxd/zfs.img"
-#  when: zfspool.rc|int != 0
-
-#- name: create new zpool for lxd
-#  command: "zpool create {{ lxd_zfs_pool_name }} /usr/lib/lxd/zfs.img"
-#  when: zfspool.rc|int != 0
-
-#- name: verify if lxd is configured to use ZFS
-#  shell: lxc info | grep storage | grep zfs
-#  register: lxcinfo
-#  ignore_errors: true
-
-#- name: check if zfs pool setup in lxd
-#  shell: "lxc storage show {{ lxd_zfs_pool_name }}"
-#  register: lxcinfo
-#  ignore_errors: true
-
-#- name: lxcinfo result
-#  debug: var=lxcinfo
-
-#- name: lxxd zfs pool
-#  debug: var=lxd_zfs_pool_name
-
-#- name: configure lxd to use zfs
-#  command: "lxd init --storage-backend zfs --storage-pool {{ lxd_zfs_pool_name }} --auto"
-#  when: lxcinfo.rc|int != 0
-
 
