@@ -5,6 +5,7 @@ lxd_server_packages:
 #  - lxd-tools
   - zfsutils-linux
   - bridge-utils
-
+  - criu
+  - tree
 lxd_client_packages:
   - lxd-client
